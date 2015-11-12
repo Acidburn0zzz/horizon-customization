@@ -6,3 +6,5 @@ used if you have created custom roles, and need to limit the what users with
 custom roles can see in Horizon.
 
 For more information please see Blue Box Ursula - https://github.com/blueboxgroup/ursula   
+
+horizon-customization is released under the Apache 2.0 license.

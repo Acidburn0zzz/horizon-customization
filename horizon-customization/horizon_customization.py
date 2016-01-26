@@ -12,24 +12,23 @@ permissions[0] = (permissions[0],) + ('openstack.roles.cloud_admin',)
 # set admin dashboard visible to both admin, and cloud_admin
 admin_dashboard.permissions = tuple(permissions)
 
-#expose aggregates to cloud_admin
-aggregates = admin_dashboard.get_panel('aggregates')
-aggregates_permissions = list(getattr(aggregates, 'permissions', []))
+#expose various panels to cloud_admin that require extra perms
+for apanel in ['aggregates', 'overview', 'hypervisors', 'instances']:
+    panel = admin_dashboard.get_panel(apanel)
+    panel_permissions = list(getattr(panel, 'permissions', []))
 
-# aggregates perms already has admin, it's a similar case as with the dashboard
-aggregates_permissions[0] = (aggregates_permissions[0],) + \
+    # perms already has admin, it's a similar case as with the dashboard
+    panel_permissions[0] = (panel_permissions[0],) + \
                             ('openstack.roles.cloud_admin',)
-aggregates.permissions = tuple(aggregates_permissions)
+    panel.permissions = tuple(panel_permissions)
 
-# hide all other admin panels from cloud_admin
-admin_panels_to_remove = ['defaults', 'flavors', 'images', 'info', 'networks',
-                        'routers', 'volumes']
+# hide specific admin panels from cloud_admin
+admin_panels_to_remove = ['info', 'metadata_defs', 'networks', 'routers']
 for p in admin_panels_to_remove:
     panel = admin_dashboard.get_panel(p)
     panel_permissions = list(getattr(panel, 'permissions', []))
     panel_permissions.append('openstack.roles.admin')
     panel.permissions = tuple(panel_permissions)
-
 
 # hide identity/domains panel from non full admins
 identity_dashboard = horizon.get_dashboard('identity')

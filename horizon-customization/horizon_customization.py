@@ -13,7 +13,7 @@ permissions[0] = (permissions[0],) + ('openstack.roles.cloud_admin',)
 admin_dashboard.permissions = tuple(permissions)
 
 #expose various panels to cloud_admin that require extra perms
-for apanel in ['aggregates', 'overview', 'hypervisors', 'instances']:
+for apanel in ['overview', 'hypervisors', 'instances']:
     panel = admin_dashboard.get_panel(apanel)
     panel_permissions = list(getattr(panel, 'permissions', []))
 

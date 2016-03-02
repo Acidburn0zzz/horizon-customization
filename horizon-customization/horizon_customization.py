@@ -23,7 +23,8 @@ for apanel in ['overview', 'hypervisors', 'instances']:
     panel.permissions = tuple(panel_permissions)
 
 # hide specific admin panels from cloud_admin
-admin_panels_to_remove = ['info', 'metadata_defs', 'networks', 'routers']
+admin_panels_to_remove = ['info', 'metadata_defs', 'networks', 'routers',
+                          'aggregates']
 for p in admin_panels_to_remove:
     panel = admin_dashboard.get_panel(p)
     panel_permissions = list(getattr(panel, 'permissions', []))

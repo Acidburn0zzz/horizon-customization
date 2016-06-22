@@ -1,25 +1,26 @@
 import horizon
 
 # expose host aggregates to cloud_admin
-# default permissions for admin_dashboard _should_ be ('openstack.roles.admin',)
-# so we want to append our cloud_admin role to the first tuple
-# https://github.com/openstack/django_openstack_auth/blob/master/openstack_auth/user.py#L376
-# (('openstack.roles.admin', 'openstack.roles.cloud_admin',),) == logcal OR
+
+# Default permissions for admin_dashboard are not set
+# if POLICY_CHECK_FUNCTION is set:
+# https://review.openstack.org/#/c/123741/ ... admin/dashboard.py
+
+# We will set admin_dashboard.permissions here:
 admin_dashboard = horizon.get_dashboard("admin")
-permissions = list(getattr(admin_dashboard, 'permissions', []))
-permissions[0] = (permissions[0],) + ('openstack.roles.cloud_admin',)
 
 # set admin dashboard visible to both admin, and cloud_admin
-admin_dashboard.permissions = tuple(permissions)
+admin_dashboard.permissions = (('openstack.roles.admin',
+                                'openstack.roles.cloud_admin',),)
 
-#expose various panels to cloud_admin that require extra perms
+# expose various panels to cloud_admin that require extra perms
 for apanel in ['hypervisors', 'instances']:
     panel = admin_dashboard.get_panel(apanel)
     panel_permissions = list(getattr(panel, 'permissions', []))
 
     # perms already has admin, it's a similar case as with the dashboard
     panel_permissions[0] = (panel_permissions[0],) + \
-                            ('openstack.roles.cloud_admin',)
+                           ('openstack.roles.cloud_admin',)
     panel.permissions = tuple(panel_permissions)
 
 # hide specific admin panels from cloud_admin

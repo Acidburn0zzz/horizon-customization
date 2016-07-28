@@ -1,4 +1,16 @@
 import horizon
+from openstack_dashboard.dashboards.identity.projects import workflows
+
+workflows.CreateProjectQuotaAction.permissions = ((
+                                                "openstack.roles.admin",
+                                                "openstack.roles.cloud_admin"
+                                                ),
+                                                "openstack.services.compute")
+workflows.UpdateProjectQuotaAction.permissions = ((
+                                                "openstack.roles.admin",
+                                                "openstack.roles.cloud_admin"
+                                                ),
+                                                "openstack.services.compute")
 
 # expose host aggregates to cloud_admin
 

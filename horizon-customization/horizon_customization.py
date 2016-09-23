@@ -1,5 +1,6 @@
 import horizon
 from openstack_dashboard.dashboards.identity.projects import workflows
+from openstack_dashboard.api import keystone
 
 workflows.CreateProjectQuotaAction.permissions = ((
                                                 "openstack.roles.admin",
@@ -57,3 +58,20 @@ resource_types = project_dashboard.get_panel('stacks.resource_types')
 resource_type_permissions = list(getattr(resource_types, 'permissions', []))
 resource_type_permissions.append('openstack.roles.admin')
 resource_types.permissions = tuple(resource_type_permissions)
+
+original_get_default_domain = keystone.get_default_domain
+
+# Set federated user domain
+# This a work around for this bug https://bugs.launchpad.net/horizon/+bug/1627062
+def _new_get_default_domain(request, get_name=True):
+  domain = original_get_default_domain(request, get_name)
+  if request.user.is_federated:
+     # If user is federated, we should use the domain of the project
+     # that the user is scoped to.
+     project = keystone.tenant_get(request, request.user.project_id)
+     domain.id = project.domain_id
+     domain.name = keystone.domain_get(request, domain.id).name
+
+  return domain
+
+keystone.get_default_domain = _new_get_default_domain
